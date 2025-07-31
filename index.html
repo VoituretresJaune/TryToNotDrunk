@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Jeu du Soda</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Menu principal -->
+  <div id="menu">
+    <h1>🥤 Jeu du Soda</h1>
+    <button onclick="openSection('production')">⚙️ Production</button>
+    <button onclick="openSection('fabrication')">🏭 Fabrication</button>
+    <button onclick="openSection('buvons')">😋 Buvons</button>
+  </div>
+
+  <!-- Interface Production -->
+  <div class="section" id="production">
+    <h2>⚙️ Produire la matière</h2>
+    <p>Matière première : <span id="matiere">0</span></p>
+    <button onclick="produire()">Produire</button>
+    <button onclick="closeSection()">❌ Fermer</button>
+  </div>
+
+  <!-- Interface Fabrication -->
+  <div class="section" id="fabrication">
+    <h2>🏭 Fabriquer le soda</h2>
+    <p>Matière : <span id="matiere2">0</span> | Sodas : <span id="sodas">0</span></p>
+    <button onclick="fabriquer()">Fabriquer Soda (5 matières)</button>
+    <button onclick="closeSection()">❌ Fermer</button>
+  </div>
+
+  <!-- Interface Buvons -->
+  <div class="section" id="buvons">
+    <h2>😋 Buvons le soda</h2>
+    <p>Sodas : <span id="sodas2">0</span> | Points : <span id="points">0</span></p>
+    <button onclick="boire()">Boire un soda</button>
+    <button onclick="closeSection()">❌ Fermer</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
