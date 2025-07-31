@@ -13,7 +13,11 @@ function sauvegarder() {
   try {
     localStorage.setItem('jeuSodaSauvegarde', JSON.stringify(donnees));
     console.log('Jeu sauvegardé !');
-    afficherMessage('💾 Jeu sauvegardé !', 'success');
+    // Réduire la fréquence des messages pour éviter le spam
+    if (Math.random() < 0.1) { // Seulement 10% du temps
+      afficherMessage('💾 Sauvegarde effectuée', 'success');
+    }
+    mettreAJourStatutSauvegarde();
   } catch (error) {
     console.error('Erreur de sauvegarde:', error);
     afficherMessage('❌ Erreur de sauvegarde', 'error');
@@ -31,11 +35,13 @@ function charger() {
       
       // Mettre à jour l'affichage
       mettreAJourAffichage();
-      console.log('Jeu chargé !');
-      afficherMessage('📁 Jeu chargé !', 'success');
+      console.log('Jeu chargé ! Matière:', matiere, 'Sodas:', sodas, 'Points:', points);
+      afficherMessage('📁 Progression restaurée !', 'success');
+      mettreAJourStatutSauvegarde();
       return true;
     } else {
-      afficherMessage('❌ Aucune sauvegarde trouvée', 'info');
+      console.log('Aucune sauvegarde trouvée');
+      mettreAJourStatutSauvegarde();
       return false;
     }
   } catch (error) {
@@ -55,9 +61,26 @@ function reinitialiser() {
       mettreAJourAffichage();
       console.log('Jeu réinitialisé !');
       afficherMessage('🔄 Jeu réinitialisé !', 'success');
+      mettreAJourStatutSauvegarde();
     } catch (error) {
       console.error('Erreur de réinitialisation:', error);
       afficherMessage('❌ Erreur de réinitialisation', 'error');
+    }
+  }
+}
+
+function mettreAJourStatutSauvegarde() {
+  const sauvegarde = localStorage.getItem('jeuSodaSauvegarde');
+  const statutElement = document.getElementById('statut-sauvegarde');
+  if (statutElement) {
+    if (sauvegarde) {
+      const donnees = JSON.parse(sauvegarde);
+      const date = new Date(donnees.dateSauvegarde);
+      statutElement.textContent = `💾 Dernière sauvegarde: ${date.toLocaleString()}`;
+      statutElement.style.color = '#4CAF50';
+    } else {
+      statutElement.textContent = '❌ Aucune sauvegarde';
+      statutElement.style.color = '#f44336';
     }
   }
 }
@@ -68,6 +91,7 @@ function mettreAJourAffichage() {
   document.getElementById('sodas').textContent = sodas;
   document.getElementById('sodas2').textContent = sodas;
   document.getElementById('points').textContent = points;
+  mettreAJourStatutSauvegarde();
 }
 
 function afficherMessage(message, type) {
@@ -104,9 +128,59 @@ function afficherMessage(message, type) {
 }
 
 // Charger automatiquement au démarrage
-window.addEventListener('load', function() {
-  charger();
+window.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM chargé, tentative de restauration...');
+  
+  // S'assurer que tous les éléments existent
+  const elements = ['matiere', 'matiere2', 'sodas', 'sodas2', 'points'];
+  let manquants = [];
+  
+  elements.forEach(id => {
+    if (!document.getElementById(id)) {
+      manquants.push(id);
+    }
+  });
+  
+  if (manquants.length > 0) {
+    console.error('Éléments manquants:', manquants);
+  }
+  
+  const chargementReussi = charger();
+  if (!chargementReussi) {
+    // Si aucune sauvegarde, initialiser l'affichage
+    mettreAJourAffichage();
+  }
+  console.log('État après chargement - Matière:', matiere, 'Sodas:', sodas, 'Points:', points);
 });
+
+// Fonction de debug pour tester la sauvegarde
+function testerSauvegarde() {
+  console.log('=== TEST DE SAUVEGARDE ===');
+  console.log('État actuel:', { matiere, sodas, points });
+  
+  // Tester si localStorage fonctionne
+  try {
+    localStorage.setItem('test', 'ok');
+    const test = localStorage.getItem('test');
+    console.log('LocalStorage fonctionne:', test === 'ok');
+    localStorage.removeItem('test');
+  } catch (e) {
+    console.error('LocalStorage ne fonctionne pas:', e);
+  }
+  
+  // Vérifier la sauvegarde actuelle
+  const sauvegarde = localStorage.getItem('jeuSodaSauvegarde');
+  console.log('Sauvegarde actuelle:', sauvegarde);
+  
+  if (sauvegarde) {
+    try {
+      const donnees = JSON.parse(sauvegarde);
+      console.log('Données sauvegardées:', donnees);
+    } catch (e) {
+      console.error('Erreur parsing sauvegarde:', e);
+    }
+  }
+}
 
 // Fonction navigation
 function openSection(name) {
